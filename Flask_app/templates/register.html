@@ -1,0 +1,94 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div class="content-section"> 
+        <!-- content-section은 main.css파일에 있는 스타일입니다. -->
+        <form method="POST" action="">
+            <!-- 동일한 경로에 해당정보를 우리가 있는 동일한 경로에 게시(POST)한다. -->
+            {{ form.hidden_tag() }}
+            <!-- hidden_tag는 간단한 해킹으로 부터 보호하는 역할을 합니다 -->
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">
+                    <!-- 등록양식의 폼이 됩니다. 아래의 문구는 register 페이지로 갈시 뜨는 문구입니다.-->
+                    Join Today
+                </legend>
+                <!-- username form -->
+                <div class="form-group">
+                    {{ form.username.label(class="form-control-label") }}
+
+                    
+                    {% if form.username.errors %}
+                    <!-- 양식에 에러가 있는경우 아래의 코드를 실행합니다. -->
+                        {{ form.username(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.username.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                    <!-- 에러가 없다면 기존의 코드를 실행합니다. -->
+                        {{ form.username(class="form-control form-control-lg") }}
+                    {% endif %}
+                    
+                </div>
+                <!-- email form -->
+                <div class="form-group">
+                    {{ form.email.label(class="form-control-label") }}
+                    {% if form.email.errors %}
+                    <!-- 양식에 에러가 있는경우 아래의 코드를 실행합니다. -->
+                        {{ form.email(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.email.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                    <!-- 에러가 없다면 기존의 코드를 실행합니다. -->
+                        {{ form.email(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <!-- password form -->
+                <div class="form-group">
+                    {{ form.password.label(class="form-control-label") }}
+                    {% if form.password.errors %}
+                    <!-- 양식에 에러가 있는경우 아래의 코드를 실행합니다. -->
+                        {{ form.password(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.password.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                    <!-- 에러가 없다면 기존의 코드를 실행합니다. -->
+                        {{ form.password(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <!-- confirm_password form -->
+                <div class="form-group">
+                    {{ form.confirm_password.label(class="form-control-label") }}
+                    {% if form.confirm_password.errors %}
+                    <!-- 양식에 에러가 있는경우 아래의 코드를 실행합니다. -->
+                        {{ form.confirm_password(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in form.confirm_password.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                    <!-- 에러가 없다면 기존의 코드를 실행합니다. -->
+                        {{ form.confirm_password(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+            </fieldset>
+            <!-- submit 버튼 -->
+            <div class="form-group">
+                {{ form.submit(class="btn btn-outline-info") }}
+            </div>
+        </form>
+    </div>
+    <div class="border-top pt-3">
+        <small class="text-muted">
+            <!-- 제출 폼 마지막에 이미 계정이 있는지 묻는 문구와 함께 로그인 링크 제공 -->
+            Already Have An Account? <a class="ml-2" href="{{ url_for('login') }}">Sign In</a>
+        </small>
+    </div>
+{% endblock content %}
