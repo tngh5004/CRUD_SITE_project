@@ -1,0 +1,64 @@
+{% extends "layout.html" %}
+{% block content %}
+    <div class="content-section">
+        <div class="media">
+        <img class="rounded-circle account-img" src="{{ image_file }}">
+        <div class="media-body">
+            <h2 class="account-heading">{{ current_user.username }}</h2>
+            <p class="text-secondary">{{ current_user.email }}</p>
+        </div>
+        </div>
+            <!-- content-section은 main.css파일에 있는 스타일입니다. -->
+            <form method="POST" action="">
+                <!-- 동일한 경로에 해당정보를 우리가 있는 동일한 경로에 게시(POST)한다. -->
+                {{ form.hidden_tag() }}
+                <!-- hidden_tag는 간단한 해킹으로 부터 보호하는 역할을 합니다 -->
+                <fieldset class="form-group">
+                    <legend class="border-bottom mb-4">
+                        <!-- 등록양식의 폼이 됩니다. 아래의 문구는 register 페이지로 갈시 뜨는 문구입니다.-->
+                        Account Info
+                    </legend>
+                    
+                   <!-- username form -->
+                    <div class="form-group">
+                        {{ form.username.label(class="form-control-label") }}
+
+                        
+                        {% if form.username.errors %}
+                        <!-- 양식에 에러가 있는경우 아래의 코드를 실행합니다. -->
+                            {{ form.username(class="form-control form-control-lg is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.username.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                        <!-- 에러가 없다면 기존의 코드를 실행합니다. -->
+                            {{ form.username(class="form-control form-control-lg") }}
+                        {% endif %}
+                        
+                    </div>
+                    <!-- email form -->
+                    <div class="form-group">
+                        {{ form.email.label(class="form-control-label") }}
+                        {% if form.email.errors %}
+                        <!-- 양식에 에러가 있는경우 아래의 코드를 실행합니다. -->
+                            {{ form.email(class="form-control form-control-lg is-invalid") }}
+                            <div class="invalid-feedback">
+                                {% for error in form.email.errors %}
+                                    <span>{{ error }}</span>
+                                {% endfor %}
+                            </div>
+                        {% else %}
+                        <!-- 에러가 없다면 기존의 코드를 실행합니다. -->
+                            {{ form.email(class="form-control form-control-lg") }}
+                        {% endif %}
+                    </div> 
+                </fieldset>
+                <!-- submit 버튼 -->
+                <div class="form-group">
+                    {{ form.submit(class="btn btn-outline-info") }}
+                </div>
+            </form>
+    </div>
+{% endblock content %}
