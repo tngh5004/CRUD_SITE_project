@@ -1,28 +1,18 @@
-from flask import render_template, flash, redirect, url_for, request
+import os
+import secrets
+from PIL import Image
+from flask import render_template, flash, redirect, url_for, request, abort
 from flaskapp import app, db, bcrypt
-from flaskapp.forms import RegistrationForm, LoginForm, UpdateAccountForm
+from flaskapp.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm
 from flaskapp.models import User, Post
 # flaskapp 패키지에 모두 옮겼기 때문에 flaskapp.forms, flaskapp.models가 된다.
 from flask_login import login_user, current_user, logout_user, login_required
 
-post1 = [
-    {
-        'author': 'Sooho Kim',
-        'title': 'Post 1',
-        'content': 'First post content',
-        'date_posted': 'March 23, 2021'
-    },
-    {
-        'author': 'Jane Doe',
-        'title': 'Post 2',
-        'content': 'Second post content',
-        'date_posted': 'March 25, 2021'
-    }
-]
 
 @app.route('/')
 @app.route('/home')
 def home():
+    post1 = Post.query.all()
     return render_template('home.html', posts=post1)
 
 @app.route('/about')
@@ -76,10 +66,92 @@ def logout():
     logout_user()
     return redirect(url_for('home'))
 
-@app.route('/account')
+def save_picture(form_picture):
+    random_hex = secrets.token_hex(8)
+    _, f_ext = os.path.splitext(form_picture.filename)
+    picture_fn = random_hex + f_ext
+    picture_path = os.path.join(app.root_path, 'static/profile_pics', picture_fn)
+
+    output_size = (125, 125)
+    i = Image.open(form_picture)
+    i.thumbnail(output_size)
+    i.save(picture_path)
+    # 사진의 크기를 125*125사이즈로 고정
+
+    i.save(picture_path)
+    # 사진의 경로는 앱의 루트경로와 패키지 디렉토리와 사진 파일 이름과 결합합니다.
+
+    return picture_fn
+
+@app.route('/account', methods=['GET', 'POST'])
 @login_required
 def account():
     form = UpdateAccountForm()
+    if form.validate_on_submit():
+        if form.picture.data:
+            picture_file = save_picture(form.picture.data)
+            current_user.image_file = picture_file
+        current_user.username = form.username.data
+        current_user.email = form.email.data
+        db.session.commit()
+        flash('Your account has been uspdated!','success')
+        return redirect(url_for('account'))
+    # Update 폼 submit시에 유저의 이름과 이메일이 폼에 적은 이름과 이메일로 변경됨
+    elif request.method == 'GET':
+        form.username.data = current_user.username
+        form.email.data = current_user.email
+    # 그냥 GET요청만 날린경우(일반적으로 입장한 경우) 폼에 현재 유저의 이름과 이메일을 보여줌
     image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
     # static폴더의 profile_pics 디렉토리 안에 있는 유저의 이미지 파일
     return render_template('account.html', title='Account', image_file=image_file, form=form)
+
+# CRUD
+# CREATE
+@app.route('/post/new', methods=['GET', 'POST'])
+@login_required
+def new_post():
+    form = PostForm()
+    if form.validate_on_submit():
+        post = Post(title = form.title.data, content = form.content.data, author=current_user)
+        db.session.add(post)
+        db.session.commit()
+        flash('Your post has been created!', 'success')
+        return redirect(url_for('home'))
+    return render_template('create_post.html', title='New Post', form=form, legend='New Post')
+
+@app.route('/post/<int:post_id>')
+def post(post_id):
+    post = Post.query.get_or_404(post_id)
+    # Post가 있으면 post id를 반환하고, 없으면 404를 반환해라
+    return render_template('post.html', title=post.title, post=post)
+
+#UPDATE
+@app.route('/post/<int:post_id>/update', methods=['GET', 'POST'])
+@login_required
+def update_post(post_id):
+    post = Post.query.get_or_404(post_id)
+    if post.author != current_user:
+        abort(403)
+    form = PostForm()
+    if form.validate_on_submit():
+        post.title = form.title.data
+        post.content = form.content.data
+        db.session.commit()
+        flash('Your post has been updated!', 'success')
+        return redirect(url_for('post', post_id=post.id))
+    elif request.method == 'GET':
+        form.title.data = post.title
+        form.content.data = post.content
+    return render_template('create_post.html', title='Update Post', form=form, legend='Update Post')
+   
+#DELETE
+@app.route('/post/<int:post_id>/delete', methods=['POST'])
+@login_required
+def delete_post(post_id):
+    post = Post.query.get_or_404(post_id)
+    if post.author != current_user:
+        abort(403)
+    db.session.delete(post)
+    db.session.commit()
+    flash('Your post has been deleted!', 'success')
+    return redirect(url_for('home'))

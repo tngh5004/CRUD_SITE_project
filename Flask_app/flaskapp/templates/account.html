@@ -9,7 +9,7 @@
         </div>
         </div>
             <!-- content-section은 main.css파일에 있는 스타일입니다. -->
-            <form method="POST" action="">
+            <form method="POST" action="" enctype="multipart/form-data">
                 <!-- 동일한 경로에 해당정보를 우리가 있는 동일한 경로에 게시(POST)한다. -->
                 {{ form.hidden_tag() }}
                 <!-- hidden_tag는 간단한 해킹으로 부터 보호하는 역할을 합니다 -->
@@ -54,6 +54,15 @@
                             {{ form.email(class="form-control form-control-lg") }}
                         {% endif %}
                     </div> 
+                    <div class="form-group">
+                        {{ form.picture.label() }}
+                        {{ form.picture(class="form-control-file") }}
+                        {% if form.picture.errors %}
+                            {% for error in form.picture.errors %}
+                                <span class="text-danger">{{ error }}</span></br>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
                 </fieldset>
                 <!-- submit 버튼 -->
                 <div class="form-group">

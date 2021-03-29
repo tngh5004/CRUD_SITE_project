@@ -1,6 +1,8 @@
 from flask_wtf import FlaskForm
+from flask_wtf.file import FileField, FileAllowed
+# FileField는 파일의 유형, FileAllowed는 파일의 유형검사기
 from flask_login import current_user
-from wtforms import StringField, PasswordField, SubmitField, BooleanField
+from wtforms import StringField, PasswordField, SubmitField, BooleanField, TextAreaField
 # 문자열, 비밀번호, 제출, 제약조건 을 위한 필드
 from wtforms.validators import DataRequired, Length, Email, EqualTo, ValidationError
 # 유효성 검사기 : 데이터의 유무, 글자수, 이메일, 동일성 확인
@@ -27,7 +29,7 @@ class RegistrationForm(FlaskForm):
         user = User.query.filter_by(username=username.data).first()
         if user:
             raise ValidationError('That username is taken. Please choose a different one')
-    
+    # 중복될경우 위의 문구로 오류를 알림
     def validate_email(self, email):
         user = User.query.filter_by(email=email.data).first()
         if user:
@@ -56,6 +58,7 @@ class UpdateAccountForm(FlaskForm):
     
     email = StringField('Email', validators=[DataRequired(), Email()])
     # 제한사항 : 공백금지, 유효한 이메일
+    picture = FileField('Update Profile Picture', validators=[FileAllowed(['jpg','png'])])
     
     submit = SubmitField('Update')
 
@@ -70,3 +73,9 @@ class UpdateAccountForm(FlaskForm):
             user = User.query.filter_by(email=email.data).first()
             if user:
                 raise ValidationError('That email is taken. Please choose a different one')
+
+
+class PostForm(FlaskForm):
+    title = StringField('Title', validators=[DataRequired()])
+    content = TextAreaField('content', validators=[DataRequired()])
+    submit = SubmitField('Post')
