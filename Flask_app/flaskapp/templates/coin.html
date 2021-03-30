@@ -1,0 +1,36 @@
+{% extends "layout.html" %}
+{% block content %}
+<div class="content-section"> 
+    <!-- content-section은 main.css파일에 있는 스타일입니다. -->
+    <form method="POST" action="">
+        <!-- 해당정보를 우리가 있는 경로에 게시(POST)한다. -->
+        {{ form.hidden_tag() }}
+        <!-- hidden_tag는 간단한 해킹으로 부터 보호하는 역할을 합니다 -->
+        <fieldset class="form-group">
+            <legend class="border-bottom mb-4">
+                {{ legend }}
+            </legend>
+            <!-- coinname form -->
+            <div class="form-group">
+                {{ form.coinname.label(class="form-control-label") }}
+                {% if form.coinname.errors %}
+                <!-- 양식에 에러가 있는경우 아래의 코드를 실행합니다. -->
+                    {{ form.coinname(class="form-control form-control-lg is-invalid") }}
+                    <div class="invalid-feedback">
+                        {% for error in form.coinname.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% else %}
+                <!-- 에러가 없다면 기존의 코드를 실행합니다. -->
+                    {{ form.coinname(class="form-control form-control-lg") }}
+                {% endif %}
+            </div>
+        </fieldset>
+        <!-- submit 버튼 -->
+        <div class="form-group">
+            {{ form.submit(class="btn btn-outline-info") }}
+        </div>
+    </form>
+</div>
+{% endblock content %}

@@ -3,8 +3,8 @@ import secrets
 from PIL import Image
 from flask import render_template, flash, redirect, url_for, request, abort
 from flaskapp import app, db, bcrypt
-from flaskapp.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm
-from flaskapp.models import User, Post
+from flaskapp.forms import RegistrationForm, LoginForm, UpdateAccountForm, PostForm, CoinForm
+from flaskapp.models import User, Post, Coin
 # flaskapp 패키지에 모두 옮겼기 때문에 flaskapp.forms, flaskapp.models가 된다.
 from flask_login import login_user, current_user, logout_user, login_required
 
@@ -15,9 +15,11 @@ def home():
     post1 = Post.query.all()
     return render_template('home.html', posts=post1)
 
-@app.route('/about')
-def about():
-    return render_template('about.html', title='About')
+@app.route('/coin', methods=['GET', 'POST'])
+@login_required
+def coin():
+    form = CoinForm()
+    return render_template('coin.html', form=form)
 
 @app.route('/register', methods=['GET', 'POST'])
 # register 페이지에서 발생하는 함수, 이 페이지에서는 get과 post 명령을 사용할 수 있음
